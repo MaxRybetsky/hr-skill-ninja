@@ -1,39 +1,59 @@
 # HRSkillNinja
 
-A lightweight candidate-tracking microservice for internal HR department use.
-Educational application.
+Легковесный микросервис для отслеживания кандидатов для внутреннего использования HR-специалистами и Экспертами-интервьюерами.
 
-## Features
+Учебное приложение.
 
-- REST/JSON API for candidate management
-- Enforced candidate lifecycle state machine
-- Full-text search capabilities
-- Input validation
-- Error handling
+## Описание
 
-## Technology Stack
+Приложение позволяет управлять информацией о кандидате на заявленную позицию.
+
+Основная информация по кандидату содержит следующее:
+
+- ФИО кандидата
+- Возраст
+- Позиция, на которую претендует кандидат
+- Информация по резюме (в тектовом формате)
+- Комментарий для внутреннего пользования
+- Текущий статус кандидата
+
+## Функционал
+
+- REST/JSON API для управления информацией о кандидата:
+    * Добавление нового кандидата
+    * Обновление данных уже заведенного в систему кандидата
+    * Обновление статуса кандидата в соостветствии со статусной моделью
+    * Добавление комментария к кандидатуре
+    * Чтение данных по кандидату
+    * Чтение данных всех кандидатов
+- Принудительная машина состояний жизненного цикла кандидата
+- Полнотекстовый поиск (по ФИО, статусу и позиции)
+- Валидация входных данных
+- Обработка ошибок
+
+## Технологический стек
 
 - Java 21 (LTS)
 - Spring Boot 3.x
 - PostgreSQL 15+
 - Maven 3.9+
 
-## Prerequisites
+## Требования
 
-- Java 21 or later
-- Maven 3.9 or later
-- PostgreSQL 15 or later
+- Java 21 или новее
+- Maven 3.9 или новее
+- PostgreSQL 15 или новее
 
-## Configuration
+## Конфигурация
 
-The application is configured via `application.yaml`. Key settings:
+Приложение настраивается через `application.yaml`. Основные настройки:
 
 ```yaml
 server:
   port: 8090
 ```
 
-## Building
+## Сборка
 
 ```bash
 mvn clean package
@@ -41,9 +61,9 @@ mvn clean package
 
 ## API Endpoints
 
-Base URL: `http://localhost:8080/api/v1/candidates`
+Базовый URL: `http://localhost:8080/api/v1/candidates`
 
-### Create Candidate
+### Создание кандидата
 ```
 POST /
 Content-Type: application/json
@@ -56,7 +76,7 @@ Content-Type: application/json
 }
 ```
 
-### Update Candidate
+### Обновление кандидата
 ```
 PUT /{id}
 Content-Type: application/json
@@ -69,7 +89,7 @@ Content-Type: application/json
 }
 ```
 
-### Change Status
+### Изменение статуса
 ```
 PUT /{id}/status
 Content-Type: application/json
@@ -79,7 +99,7 @@ Content-Type: application/json
 }
 ```
 
-### Change Comment
+### Изменение комментария
 ```
 PUT /{id}/comment
 Content-Type: application/json
@@ -89,26 +109,26 @@ Content-Type: application/json
 }
 ```
 
-### Get All Candidates
+### Получение всех кандидатов
 ```
 GET /
 ```
 
-### Get Candidate by ID
+### Получение кандидата по ID
 ```
 GET /{id}
 ```
 
-### Search Candidates
+### Поиск кандидатов
 ```
 GET /search?fio=Ivanov&status=NEW,CV_REVIEW&position=Developer
 ```
 
-## Candidate Status Flow
+## Статусная модель
 
 ```
 NEW → CV_REVIEW → SCHEDULED_FOR_INTERVIEW → INTERVIEW → OFFER → ACCEPTED → STARTED_WORKING
    ↘ DECLINED
 ```
 
-Any state can transition to DECLINED.
+Любой статус может перейти в DECLINED.
