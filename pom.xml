@@ -24,6 +24,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <logstash.version>7.4</logstash.version>
         <springdoc.version>2.3.0</springdoc.version>
+        <flyway.version>9.22.3</flyway.version>
     </properties>
 
     <dependencies>
@@ -47,19 +48,17 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
 
         <!-- Mapping -->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
-        </dependency>
-
-        <!-- Logging -->
-        <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-            <version>${logstash.version}</version>
         </dependency>
 
         <!-- Development -->
