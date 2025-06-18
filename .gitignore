@@ -66,4 +66,5 @@ Thumbs.db
 application-local.yaml
 application-dev.yaml
 application-prod.yaml
+application-db.yaml
 *.env 
