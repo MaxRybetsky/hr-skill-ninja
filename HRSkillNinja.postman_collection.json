@@ -136,6 +136,55 @@
 					]
 				}
 			}
+		},
+		{
+			"name": "Upload CV",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": ""
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/candidates/{{candidateId}}/cv",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"candidates",
+						"{{candidateId}}",
+						"cv"
+					]
+				}
+			}
+		},
+		{
+			"name": "Download CV",
+			"request": {
+				"method": "GET",
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/candidates/{{candidateId}}/cv",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"candidates",
+						"{{candidateId}}",
+						"cv"
+					]
+				}
+			}
 		}
 	],
 	"variable": [
