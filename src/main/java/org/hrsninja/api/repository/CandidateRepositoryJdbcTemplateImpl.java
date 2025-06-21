@@ -6,8 +6,13 @@ import org.hrsninja.api.model.Candidate;
 import org.hrsninja.api.model.CandidateStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Types;
 import java.util.*;
 import java.util.List;
 
@@ -17,6 +22,7 @@ import java.util.List;
 public class CandidateRepositoryJdbcTemplateImpl implements CandidateRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private static final RowMapper<Candidate> ROW_MAPPER = (rs, rowNum) -> {
         Candidate candidate = new Candidate();
@@ -51,24 +57,41 @@ public class CandidateRepositoryJdbcTemplateImpl implements CandidateRepository 
 
     @Override
     public void saveAll(List<Candidate> candidates) {
-        String sql = """
+        final String sql = """
                 INSERT INTO candidates (id, fio, age, position, cv_info, status)
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (:id, :fio, :age, :position, :cvInfo, :status)
                 """;
 
-        log.info("Save all candidates by JDBC Template");
+        log.info("Save all candidates by Named JDBC Template");
 
-        jdbcTemplate.batchUpdate(sql,
-                candidates,
-                5,
-                (ps, candidate) -> {
-                    ps.setObject(1, candidate.getId());
-                    ps.setString(2, candidate.getFio());
-                    ps.setShort(3, candidate.getAge());
-                    ps.setString(4, candidate.getPosition());
-                    ps.setString(5, candidate.getCvInfo());
-                    ps.setString(6, candidate.getStatus().name());
-                });
+        /*
+        Первый вариант - используем получение значений по спецификации JavaBean-а
+        SqlParameterSource[] batch = SqlParameterSourceUtils.createBatch(candidates);
+
+        После первого запуска получим ошибку, так как значение поля status является enum-ом,
+        т.е. неизвестно для драйвера. Первый вариант исправления - добавляем метод getStatusString
+        и в sql скрипте исправляем status на statusString:
+
+        INSERT INTO candidates (id, fio, age, position, cv_info, status)
+        VALUES (:id, :fio, :age, :position, :cvInfo, :statusString)
+
+
+        Второй вариант - использовать явный маппинг параметров */
+        SqlParameterSource[] batch = candidates.stream()
+                .map(this::toParamSource)
+                .toArray(SqlParameterSource[]::new);
+
+        namedParameterJdbcTemplate.batchUpdate(sql, batch);
+    }
+
+    private MapSqlParameterSource toParamSource(Candidate c) {
+        return new MapSqlParameterSource()
+                .addValue("id", c.getId())
+                .addValue("fio", c.getFio())
+                .addValue("age", c.getAge())
+                .addValue("position", c.getPosition())
+                .addValue("cvInfo", c.getCvInfo())
+                .addValue("status", c.getStatus().name(), Types.VARCHAR);
     }
 
     @Override

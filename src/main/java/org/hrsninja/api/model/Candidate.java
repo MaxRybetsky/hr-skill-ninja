@@ -15,4 +15,12 @@ public class Candidate {
     private String cvInfo;
     private String comment;
     private CandidateStatus status;
+
+    /**
+     * Вариант исправления ошибки при получении значения статуса для последующего сохранения в БД.
+     * @return Статус в строковом значении.
+     */
+    public String getStatusString() {
+        return status.name();
+    }
 } 
