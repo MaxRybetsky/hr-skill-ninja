@@ -136,6 +136,34 @@
 					]
 				}
 			}
+		},
+		{
+			"name": "Create Candidates (Batch)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"candidates\": [\n        {\n            \"fio\": \"Sidorov Sidor Sidorovich\",\n            \"age\": 28,\n            \"position\": \"QA Engineer\",\n            \"cvInfo\": \"Experienced QA with 3+ years of experience\"\n        },\n        {\n            \"fio\": \"Petrov Petr Petrovich\",\n            \"age\": 45,\n            \"position\": \"Team Lead\",\n            \"cvInfo\": \"Experienced Team Lead with 10+ years of experience\"\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/candidates/batch",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"candidates",
+						"batch"
+					]
+				}
+			}
 		}
 	],
 	"variable": [

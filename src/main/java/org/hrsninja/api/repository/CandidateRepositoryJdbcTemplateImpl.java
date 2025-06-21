@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -46,6 +47,28 @@ public class CandidateRepositoryJdbcTemplateImpl implements CandidateRepository 
                 candidate.getPosition(),
                 candidate.getCvInfo(),
                 candidate.getStatus().name());
+    }
+
+    @Override
+    public void saveAll(List<Candidate> candidates) {
+        String sql = """
+                INSERT INTO candidates (id, fio, age, position, cv_info, status)
+                VALUES (?, ?, ?, ?, ?, ?)
+                """;
+
+        log.info("Save all candidates by JDBC Template");
+
+        jdbcTemplate.batchUpdate(sql,
+                candidates,
+                5,
+                (ps, candidate) -> {
+                    ps.setObject(1, candidate.getId());
+                    ps.setString(2, candidate.getFio());
+                    ps.setShort(3, candidate.getAge());
+                    ps.setString(4, candidate.getPosition());
+                    ps.setString(5, candidate.getCvInfo());
+                    ps.setString(6, candidate.getStatus().name());
+                });
     }
 
     @Override

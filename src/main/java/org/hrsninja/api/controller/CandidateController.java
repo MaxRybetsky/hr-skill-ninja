@@ -21,6 +21,12 @@ public class CandidateController {
 
     private final CandidateService service;
 
+    @PostMapping("/batch")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CandidatesDTO createBatch(@Valid @RequestBody BatchCandidatesCreateRequest request) {
+        return service.saveAll(request);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CandidateDTO create(@Valid @RequestBody CreateCandidateRequest request) {
