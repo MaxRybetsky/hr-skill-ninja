@@ -15,5 +15,10 @@ spring:
     locations: classpath:db/migration
     schemas: public
 
+logging:
+  level:
+    com.zaxxer.hikari: DEBUG
+    com.zaxxer.hikari.pool: TRACE
+
 server:
   port: 8090
