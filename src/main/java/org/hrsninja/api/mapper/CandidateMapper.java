@@ -1,4 +1,4 @@
-package org.hrsninja.api.service;
+package org.hrsninja.api.mapper;
 
 import org.hrsninja.api.dto.CandidateDTO;
 import org.hrsninja.api.dto.CreateCandidateRequest;

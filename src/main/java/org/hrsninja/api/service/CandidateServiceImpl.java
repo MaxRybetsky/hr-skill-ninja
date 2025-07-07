@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.hrsninja.api.dto.*;
 import org.hrsninja.api.exception.CandidateNotFoundException;
 import org.hrsninja.api.exception.IllegalStatusTransitionException;
+import org.hrsninja.api.mapper.CandidateMapper;
 import org.hrsninja.api.model.Candidate;
 import org.hrsninja.api.model.CandidateStatus;
 import org.hrsninja.api.repository.CandidateRepository;
