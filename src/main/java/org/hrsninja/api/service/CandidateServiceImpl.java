@@ -3,11 +3,13 @@ package org.hrsninja.api.service;
 import lombok.RequiredArgsConstructor;
 import org.hrsninja.api.dto.*;
 import org.hrsninja.api.exception.CandidateNotFoundException;
+import org.hrsninja.api.exception.CustomCheckedException;
 import org.hrsninja.api.exception.IllegalStatusTransitionException;
 import org.hrsninja.api.model.Candidate;
 import org.hrsninja.api.model.CandidateStatus;
 import org.hrsninja.api.repository.CandidateRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,7 +33,8 @@ public class CandidateServiceImpl implements CandidateService {
     );
 
     @Override
-    public CandidateDTO create(CreateCandidateRequest request) {
+    @Transactional(rollbackFor = {CustomCheckedException.class})
+    public CandidateDTO create(CreateCandidateRequest request) throws CustomCheckedException {
         Candidate candidate = new Candidate();
 
         candidate.setId(UUID.randomUUID());
@@ -41,7 +44,11 @@ public class CandidateServiceImpl implements CandidateService {
         candidate.setCvInfo(request.getCvInfo());
         candidate.setStatus(CandidateStatus.NEW);
 
-        return mapper.toDTO(repository.save(candidate));
+        Candidate saved = repository.save(candidate);
+
+        throw new CustomCheckedException();
+
+        //return mapper.toDTO(saved);
     }
 
     @Override

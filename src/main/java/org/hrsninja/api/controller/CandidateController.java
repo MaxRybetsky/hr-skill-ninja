@@ -3,6 +3,7 @@ package org.hrsninja.api.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hrsninja.api.dto.*;
+import org.hrsninja.api.exception.CustomCheckedException;
 import org.hrsninja.api.model.CandidateStatus;
 import org.hrsninja.api.service.CandidateService;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class CandidateController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CandidateDTO create(@Valid @RequestBody CreateCandidateRequest request) {
+    public CandidateDTO create(@Valid @RequestBody CreateCandidateRequest request) throws CustomCheckedException {
         return service.create(request);
     }
 
