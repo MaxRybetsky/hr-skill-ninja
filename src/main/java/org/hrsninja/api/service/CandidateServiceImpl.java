@@ -8,6 +8,7 @@ import org.hrsninja.api.exception.IllegalStatusTransitionException;
 import org.hrsninja.api.model.Candidate;
 import org.hrsninja.api.model.CandidateStatus;
 import org.hrsninja.api.repository.CandidateRepository;
+import org.hrsninja.api.repository.CandidateSaveHistoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class CandidateServiceImpl implements CandidateService {
 
     private final CandidateRepository repository;
+    private final CandidateSaveHistoryService saveHistoryService;
     private final CandidateMapper mapper;
 
     private static final Map<CandidateStatus, Set<CandidateStatus>> ALLOWED_TRANSITIONS = Map.of(
@@ -45,6 +47,8 @@ public class CandidateServiceImpl implements CandidateService {
         candidate.setStatus(CandidateStatus.NEW);
 
         Candidate saved = repository.save(candidate);
+
+        saveHistoryService.save(candidate.getId());
 
         throw new CustomCheckedException();
 
