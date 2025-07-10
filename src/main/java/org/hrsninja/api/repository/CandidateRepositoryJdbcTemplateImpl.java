@@ -7,9 +7,6 @@ import org.hrsninja.api.model.CandidateStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.*;
 
@@ -19,7 +16,6 @@ import java.util.*;
 public class CandidateRepositoryJdbcTemplateImpl implements CandidateRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final PlatformTransactionManager txManager;
 
     private static final RowMapper<Candidate> ROW_MAPPER = (rs, rowNum) -> {
         Candidate candidate = new Candidate();
@@ -43,25 +39,13 @@ public class CandidateRepositoryJdbcTemplateImpl implements CandidateRepository 
 
         log.info("Save candidate by JDBC Template");
 
-        DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
-        TransactionStatus transaction = txManager.getTransaction(definition);
-
-        try {
-            Candidate savedCandidate = jdbcTemplate.queryForObject(sql, ROW_MAPPER,
-                    candidate.getId(),
-                    candidate.getFio(),
-                    candidate.getAge(),
-                    candidate.getPosition(),
-                    candidate.getCvInfo(),
-                    candidate.getStatus().name());
-
-            txManager.commit(transaction);
-
-            return savedCandidate;
-        } catch (Exception e) {
-            txManager.rollback(transaction);
-            throw e;
-        }
+        return jdbcTemplate.queryForObject(sql, ROW_MAPPER,
+                candidate.getId(),
+                candidate.getFio(),
+                candidate.getAge(),
+                candidate.getPosition(),
+                candidate.getCvInfo(),
+                candidate.getStatus().name());
     }
 
     @Override

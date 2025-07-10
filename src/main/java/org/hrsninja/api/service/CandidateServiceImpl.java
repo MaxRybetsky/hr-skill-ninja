@@ -1,6 +1,7 @@
 package org.hrsninja.api.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hrsninja.api.dto.*;
 import org.hrsninja.api.exception.CandidateNotFoundException;
 import org.hrsninja.api.exception.IllegalStatusTransitionException;
@@ -8,16 +9,21 @@ import org.hrsninja.api.model.Candidate;
 import org.hrsninja.api.model.CandidateStatus;
 import org.hrsninja.api.repository.CandidateRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CandidateServiceImpl implements CandidateService {
 
     private final CandidateRepository repository;
     private final CandidateMapper mapper;
+    private final PlatformTransactionManager txManager;
 
     private static final Map<CandidateStatus, Set<CandidateStatus>> ALLOWED_TRANSITIONS = Map.of(
         CandidateStatus.NEW, Set.of(CandidateStatus.CV_REVIEW, CandidateStatus.DECLINED),
@@ -32,6 +38,10 @@ public class CandidateServiceImpl implements CandidateService {
 
     @Override
     public CandidateDTO create(CreateCandidateRequest request) {
+
+        DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
+        TransactionStatus transaction = txManager.getTransaction(definition);
+
         Candidate candidate = new Candidate();
 
         candidate.setId(UUID.randomUUID());
@@ -41,7 +51,27 @@ public class CandidateServiceImpl implements CandidateService {
         candidate.setCvInfo(request.getCvInfo());
         candidate.setStatus(CandidateStatus.NEW);
 
-        return mapper.toDTO(repository.save(candidate));
+        try {
+            Candidate saved = repository.save(candidate);
+
+
+            sendInfo(saved);
+
+            txManager.commit(transaction);
+
+            return mapper.toDTO(saved);
+        } catch (Exception e) {
+            txManager.rollback(transaction);
+            throw e;
+        }
+    }
+
+    private void sendInfo(Candidate saved) {
+        log.info("Send candidate ID={} info", saved.getId());
+
+        if (!saved.getPosition().contains("Java")) {
+            throw new RuntimeException();
+        }
     }
 
     @Override
