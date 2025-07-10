@@ -8,7 +8,6 @@ import org.hrsninja.api.exception.IllegalStatusTransitionException;
 import org.hrsninja.api.model.Candidate;
 import org.hrsninja.api.model.CandidateStatus;
 import org.hrsninja.api.repository.CandidateRepository;
-import org.hrsninja.api.repository.CandidateSaveHistoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +47,7 @@ public class CandidateServiceImpl implements CandidateService {
 
         Candidate saved = repository.save(candidate);
 
-        saveHistoryService.save(candidate.getId());
+        saveHistoryService.createHistoryNote(candidate.getId());
 
         throw new CustomCheckedException();
 
