@@ -1,26 +1,31 @@
 package org.hrsninja.api.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hrsninja.api.dto.*;
 import org.hrsninja.api.exception.CandidateNotFoundException;
 import org.hrsninja.api.exception.CustomCheckedException;
 import org.hrsninja.api.exception.IllegalStatusTransitionException;
 import org.hrsninja.api.model.Candidate;
+import org.hrsninja.api.model.CandidateSaveHistoryEntity;
 import org.hrsninja.api.model.CandidateStatus;
 import org.hrsninja.api.repository.CandidateRepository;
 import org.hrsninja.api.repository.CandidateSaveHistoryRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CandidateServiceImpl implements CandidateService {
 
     private final CandidateRepository repository;
-    private final CandidateSaveHistoryService saveHistoryService;
+    private final CandidateSaveHistoryRepository saveHistoryRepository;
     private final CandidateMapper mapper;
 
     private static final Map<CandidateStatus, Set<CandidateStatus>> ALLOWED_TRANSITIONS = Map.of(
@@ -35,8 +40,8 @@ public class CandidateServiceImpl implements CandidateService {
     );
 
     @Override
-    @Transactional(rollbackFor = {CustomCheckedException.class})
-    public CandidateDTO create(CreateCandidateRequest request) throws CustomCheckedException {
+    @Transactional
+    public CandidateDTO create(CreateCandidateRequest request) {
         Candidate candidate = new Candidate();
 
         candidate.setId(UUID.randomUUID());
@@ -48,11 +53,21 @@ public class CandidateServiceImpl implements CandidateService {
 
         Candidate saved = repository.save(candidate);
 
-        saveHistoryService.save(candidate.getId());
+        save(candidate.getId());
 
-        throw new CustomCheckedException();
+        return mapper.toDTO(saved);
+    }
 
-        //return mapper.toDTO(saved);
+    @Transactional(propagation = Propagation.NEVER)
+    public void save(UUID candidateId) {
+        log.info("Add history note");
+        CandidateSaveHistoryEntity entity = new CandidateSaveHistoryEntity();
+
+        entity.setId(UUID.randomUUID());
+        entity.setCandidateId(candidateId);
+        entity.setCreatedDatetime(LocalDateTime.now());
+
+        saveHistoryRepository.save(entity);
     }
 
     @Override
