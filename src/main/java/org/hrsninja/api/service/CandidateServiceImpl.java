@@ -9,9 +9,7 @@ import org.hrsninja.api.model.Candidate;
 import org.hrsninja.api.model.CandidateStatus;
 import org.hrsninja.api.repository.CandidateRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +21,6 @@ public class CandidateServiceImpl implements CandidateService {
 
     private final CandidateRepository repository;
     private final CandidateMapper mapper;
-    private final PlatformTransactionManager txManager;
 
     private static final Map<CandidateStatus, Set<CandidateStatus>> ALLOWED_TRANSITIONS = Map.of(
         CandidateStatus.NEW, Set.of(CandidateStatus.CV_REVIEW, CandidateStatus.DECLINED),
@@ -37,11 +34,8 @@ public class CandidateServiceImpl implements CandidateService {
     );
 
     @Override
+    @Transactional
     public CandidateDTO create(CreateCandidateRequest request) {
-
-        DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
-        TransactionStatus transaction = txManager.getTransaction(definition);
-
         Candidate candidate = new Candidate();
 
         candidate.setId(UUID.randomUUID());
@@ -51,33 +45,13 @@ public class CandidateServiceImpl implements CandidateService {
         candidate.setCvInfo(request.getCvInfo());
         candidate.setStatus(CandidateStatus.NEW);
 
-        try {
-            Candidate saved = repository.save(candidate);
-
-
-            sendInfo(saved);
-
-            txManager.commit(transaction);
-
-            return mapper.toDTO(saved);
-        } catch (Exception e) {
-            txManager.rollback(transaction);
-            throw e;
-        }
-    }
-
-    private void sendInfo(Candidate saved) {
-        log.info("Send candidate ID={} info", saved.getId());
-
-        if (!saved.getPosition().contains("Java")) {
-            throw new RuntimeException();
-        }
+        return mapper.toDTO(repository.save(candidate));
     }
 
     @Override
     public CandidateDTO update(UUID id, UpdateCandidateRequest request) {
         Candidate candidate = getCandidateOrThrow(id);
-        
+
         candidate.setFio(request.getFio());
         candidate.setAge(request.getAge());
         candidate.setPosition(request.getPosition());
@@ -89,10 +63,10 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public CandidateDTO changeStatus(UUID id, ChangeStatusRequest request) {
         Candidate candidate = getCandidateOrThrow(id);
-        
+
         if (!isValidTransition(candidate.getStatus(), request.getStatus())) {
             throw new IllegalStatusTransitionException(
-                String.format("Cannot transition from %s to %s", 
+                String.format("Cannot transition from %s to %s",
                     candidate.getStatus(), request.getStatus()));
         }
 
@@ -108,6 +82,7 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CandidateDTO> findAll() {
         return repository.findAll().stream()
             .map(mapper::toDTO)
@@ -115,6 +90,7 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CandidateDTO findById(UUID id) {
         return repository.findById(id)
             .map(mapper::toDTO)
@@ -122,6 +98,7 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CandidateDTO> search(String fio, Set<CandidateStatus> statuses, String position) {
         return repository.search(fio, statuses, position).stream()
             .map(mapper::toDTO)
