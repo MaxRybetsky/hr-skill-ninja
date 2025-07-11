@@ -18,7 +18,7 @@ public class CandidateSaveHistoryService {
     private final CandidateSaveHistoryRepository saveHistoryRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW) // DEFAULT, REQUIRES_NEW, NEVER, MANDATORY
-    public void save(UUID candidateId) {
+    public void createHistoryNote(UUID candidateId) {
         log.info("Add history note");
         CandidateSaveHistoryEntity entity = new CandidateSaveHistoryEntity();
 

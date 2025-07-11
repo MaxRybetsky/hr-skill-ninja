@@ -40,8 +40,8 @@ public class CandidateServiceImpl implements CandidateService {
     );
 
     @Override
-    @Transactional
-    public CandidateDTO create(CreateCandidateRequest request) {
+    @Transactional(rollbackFor = {CustomCheckedException.class})
+    public CandidateDTO create(CreateCandidateRequest request) throws CustomCheckedException {
         Candidate candidate = new Candidate();
 
         candidate.setId(UUID.randomUUID());
@@ -53,13 +53,15 @@ public class CandidateServiceImpl implements CandidateService {
 
         Candidate saved = repository.save(candidate);
 
-        save(candidate.getId());
+        createHistoryNote(candidate.getId());
 
-        return mapper.toDTO(saved);
+        throw new CustomCheckedException();
+
+        //return mapper.toDTO(saved);
     }
 
-    @Transactional(propagation = Propagation.NEVER)
-    public void save(UUID candidateId) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createHistoryNote(UUID candidateId) {
         log.info("Add history note");
         CandidateSaveHistoryEntity entity = new CandidateSaveHistoryEntity();
 
