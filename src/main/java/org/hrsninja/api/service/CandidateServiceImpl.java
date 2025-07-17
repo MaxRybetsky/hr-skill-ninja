@@ -34,7 +34,6 @@ public class CandidateServiceImpl implements CandidateService {
     public CandidateDTO create(CreateCandidateRequest request) {
         Candidate candidate = new Candidate();
 
-        candidate.setId(UUID.randomUUID());
         candidate.setFio(request.getFio());
         candidate.setAge(request.getAge());
         candidate.setPosition(request.getPosition());
