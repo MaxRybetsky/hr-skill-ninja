@@ -3,6 +3,7 @@ package org.hrsninja.api.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,7 +61,7 @@ public class HibernateConfig {
         
         // Конфигурируем свойства подключения к БД
         Properties properties = new Properties();
-        properties.put(Environment.JAKARTA_JTA_DATASOURCE, dataSource);
+        properties.put(AvailableSettings.DATASOURCE, dataSource);
 
         configuration.setProperties(properties);
         
