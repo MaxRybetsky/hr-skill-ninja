@@ -4,11 +4,13 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 @org.springframework.context.annotation.Configuration
 public class HibernateConfig {
@@ -50,17 +52,17 @@ public class HibernateConfig {
         Configuration configuration = new Configuration();
         
         // Конфигурируем свойства Hibernate
-        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-        configuration.setProperty("hibernate.hbm2ddl.auto", "validate");
-        configuration.setProperty("hibernate.show_sql", "true");
-        configuration.setProperty("hibernate.format_sql", "true");
-        configuration.setProperty("hibernate.use_sql_comments", "true");
+        configuration.setProperty(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
+        configuration.setProperty(Environment.HBM2DDL_AUTO, "validate");
+        configuration.setProperty(Environment.SHOW_SQL, "true");
+        configuration.setProperty(Environment.FORMAT_SQL, "true");
+        configuration.setProperty(Environment.USE_SQL_COMMENTS, "true");
         
         // Конфигурируем свойства подключения к БД
-        configuration.setProperty("hibernate.connection.driver_class", driverClassName);
-        configuration.setProperty("hibernate.connection.url", url);
-        configuration.setProperty("hibernate.connection.username", username);
-        configuration.setProperty("hibernate.connection.password", password);
+        Properties properties = new Properties();
+        properties.put(Environment.JAKARTA_JTA_DATASOURCE, dataSource);
+
+        configuration.setProperties(properties);
         
         // Добавим классы сущностей
         configuration.addAnnotatedClass(org.hrsninja.api.model.Candidate.class);
