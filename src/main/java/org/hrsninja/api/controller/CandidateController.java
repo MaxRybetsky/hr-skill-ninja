@@ -37,26 +37,27 @@ public class CandidateController {
         return service.changeStatus(id, request);
     }
 
-    @PutMapping("/{id}/comment")
-    public CandidateDTO changeComment(@PathVariable UUID id, @Valid @RequestBody ChangeCommentRequest request) {
-        return service.changeComment(id, request);
-    }
-
     @GetMapping
     public List<CandidateDTO> findAll() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public CandidateDTO findById(@PathVariable UUID id) {
+    public ExtendedCandidateDTO findById(@PathVariable UUID id) {
+        // Returns candidate with all comments (see Candidate entity mapping)
         return service.findById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable UUID id) {
+        service.deleteById(id);
     }
 
     @GetMapping("/search")
     public List<CandidateDTO> search(
             @RequestParam(required = false) String fio,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String position) {
+            @RequestParam(required = false) String status) {
         Set<CandidateStatus> statuses = null;
         if (status != null && !status.isBlank()) {
             statuses = Arrays.stream(status.split(","))
@@ -65,6 +66,6 @@ public class CandidateController {
                 .collect(Collectors.toSet());
         }
 
-        return service.search(fio, statuses, position);
+        return service.search(fio, statuses);
     }
 } 

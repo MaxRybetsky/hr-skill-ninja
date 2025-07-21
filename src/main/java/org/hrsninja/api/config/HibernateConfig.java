@@ -67,6 +67,8 @@ public class HibernateConfig {
         
         // Добавим классы сущностей
         configuration.addAnnotatedClass(org.hrsninja.api.model.Candidate.class);
+        configuration.addAnnotatedClass(org.hrsninja.api.model.Comment.class);
+        configuration.addAnnotatedClass(org.hrsninja.api.model.Position.class);
         
         return configuration.buildSessionFactory();
     }

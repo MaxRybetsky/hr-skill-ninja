@@ -21,7 +21,7 @@ public class CandidateRepositoryJdbcImpl implements CandidateRepository {
         String sql = """
                 INSERT INTO candidates (id, fio, age, position, cv_info, status)
                 VALUES (?, ?, ?, ?, ?, ?)
-                RETURNING id, fio, age, position, cv_info, comment, status
+                RETURNING id, fio, age, cv_info, status
                 """;
 
         try (Connection conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
@@ -30,7 +30,6 @@ public class CandidateRepositoryJdbcImpl implements CandidateRepository {
             stmt.setObject(1, candidate.getId());
             stmt.setString(2, candidate.getFio());
             stmt.setShort(3, candidate.getAge());
-            stmt.setString(4, candidate.getPosition());
             stmt.setString(5, candidate.getCvInfo());
             stmt.setString(6, candidate.getStatus().name());
 
@@ -49,9 +48,9 @@ public class CandidateRepositoryJdbcImpl implements CandidateRepository {
     public Candidate update(Candidate candidate) {
         String sql = """
                 UPDATE candidates
-                SET fio = ?, age = ?, position = ?, cv_info = ?, status = ?, comment = ?
+                SET fio = ?, age = ?, cv_info = ?, status = ?
                 WHERE id = ?
-                RETURNING id, fio, age, position, cv_info, comment, status
+                RETURNING id, fio, age, cv_info, status
                 """;
 
         try (Connection conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
@@ -59,10 +58,8 @@ public class CandidateRepositoryJdbcImpl implements CandidateRepository {
 
             stmt.setString(1, candidate.getFio());
             stmt.setShort(2, candidate.getAge());
-            stmt.setString(3, candidate.getPosition());
             stmt.setString(4, candidate.getCvInfo());
             stmt.setString(5, candidate.getStatus().name());
-            stmt.setString(6, candidate.getComment());
             stmt.setObject(7, candidate.getId());
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -123,7 +120,7 @@ public class CandidateRepositoryJdbcImpl implements CandidateRepository {
     }
 
     @Override
-    public List<Candidate> search(String fio, Set<CandidateStatus> statuses, String position) {
+    public List<Candidate> search(String fio, Set<CandidateStatus> statuses) {
         StringBuilder sql = new StringBuilder("""
                 SELECT id, fio, age, position, cv_info, comment, status
                 FROM candidates
@@ -140,11 +137,6 @@ public class CandidateRepositoryJdbcImpl implements CandidateRepository {
         if (statuses != null && !statuses.isEmpty()) {
             sql.append(" AND status = ANY(?)");
             params.add(statuses.stream().map(Enum::name).toArray(String[]::new));
-        }
-
-        if (position != null && !position.isBlank()) {
-            sql.append(" AND position ILIKE ?");
-            params.add("%" + position + "%");
         }
 
         sql.append(" ORDER BY fio ASC");
@@ -168,14 +160,17 @@ public class CandidateRepositoryJdbcImpl implements CandidateRepository {
         }
     }
 
+    @Override
+    public void deleteById(UUID id) {
+        // Not implemented yet
+    }
+
     private Candidate mapRow(ResultSet rs) throws SQLException {
         Candidate candidate = new Candidate();
         candidate.setId(rs.getObject("id", UUID.class));
         candidate.setFio(rs.getString("fio"));
         candidate.setAge(rs.getShort("age"));
-        candidate.setPosition(rs.getString("position"));
         candidate.setCvInfo(rs.getString("cv_info"));
-        candidate.setComment(rs.getString("comment"));
         candidate.setStatus(CandidateStatus.valueOf(rs.getString("status")));
         return candidate;
     }

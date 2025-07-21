@@ -1,4 +1,4 @@
-package org.hrsninja.api.service;
+package org.hrsninja.api.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.hrsninja.api.dto.*;
@@ -7,10 +7,13 @@ import org.hrsninja.api.exception.IllegalStatusTransitionException;
 import org.hrsninja.api.model.Candidate;
 import org.hrsninja.api.model.CandidateStatus;
 import org.hrsninja.api.repository.CandidateRepository;
+import org.hrsninja.api.mapper.CandidateMapper;
+import org.hrsninja.api.service.CandidateService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.hrsninja.api.dto.ExtendedCandidateDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +39,6 @@ public class CandidateServiceImpl implements CandidateService {
 
         candidate.setFio(request.getFio());
         candidate.setAge(request.getAge());
-        candidate.setPosition(request.getPosition());
         candidate.setCvInfo(request.getCvInfo());
         candidate.setStatus(CandidateStatus.NEW);
 
@@ -49,7 +51,6 @@ public class CandidateServiceImpl implements CandidateService {
         
         candidate.setFio(request.getFio());
         candidate.setAge(request.getAge());
-        candidate.setPosition(request.getPosition());
         candidate.setCvInfo(request.getCvInfo());
 
         return mapper.toDTO(repository.update(candidate));
@@ -70,13 +71,6 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
-    public CandidateDTO changeComment(UUID id, ChangeCommentRequest request) {
-        Candidate candidate = getCandidateOrThrow(id);
-        candidate.setComment(request.getComment());
-        return mapper.toDTO(repository.update(candidate));
-    }
-
-    @Override
     public List<CandidateDTO> findAll() {
         return repository.findAll().stream()
             .map(mapper::toDTO)
@@ -84,17 +78,22 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
-    public CandidateDTO findById(UUID id) {
+    public ExtendedCandidateDTO findById(UUID id) {
         return repository.findById(id)
-            .map(mapper::toDTO)
-            .orElseThrow(() -> new CandidateNotFoundException(id));
+                .map(mapper::toExtendedDTO)
+                .orElseThrow(() -> new CandidateNotFoundException(id));
     }
 
     @Override
-    public List<CandidateDTO> search(String fio, Set<CandidateStatus> statuses, String position) {
-        return repository.search(fio, statuses, position).stream()
+    public List<CandidateDTO> search(String fio, Set<CandidateStatus> statuses) {
+        return repository.search(fio, statuses).stream()
             .map(mapper::toDTO)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        repository.deleteById(id);
     }
 
     private Candidate getCandidateOrThrow(UUID id) {

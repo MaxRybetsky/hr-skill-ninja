@@ -126,7 +126,7 @@ public class CandidatesHibernateRepositoryImpl implements CandidateRepository {
     }
 
     @Override
-    public List<Candidate> search(String fio, Set<CandidateStatus> statuses, String position) {
+    public List<Candidate> search(String fio, Set<CandidateStatus> statuses) {
         Transaction transaction = null;
 
         try (Session session = sessionFactory.openSession()) {
@@ -134,7 +134,7 @@ public class CandidatesHibernateRepositoryImpl implements CandidateRepository {
 
             transaction = session.beginTransaction();
 
-            StringBuilder hql = buildHql(fio, statuses, position);
+            StringBuilder hql = buildHql(fio, statuses);
 
             Query<Candidate> query = session.createQuery(hql.toString(), Candidate.class);
             
@@ -144,10 +144,6 @@ public class CandidatesHibernateRepositoryImpl implements CandidateRepository {
             
             if (statuses != null && !statuses.isEmpty()) {
                 query.setParameter("statuses", statuses);
-            }
-            
-            if (position != null && !position.trim().isEmpty()) {
-                query.setParameter("position", "%" + position.trim() + "%");
             }
 
             List<Candidate> candidates = query.list();
@@ -166,7 +162,34 @@ public class CandidatesHibernateRepositoryImpl implements CandidateRepository {
         }
     }
 
-    private StringBuilder buildHql(String fio, Set<CandidateStatus> statuses, String position) {
+    @Override
+    public void deleteById(UUID id) {
+        Transaction transaction = null;
+
+        try (Session session = sessionFactory.openSession()) {
+            log.info("Delete candidate by ID via Hibernate");
+
+            transaction = session.beginTransaction();
+
+            Candidate candidate = session.get(Candidate.class, id);
+            if (candidate != null) {
+                candidate.getPositions().forEach(position -> position.getCandidates().remove(candidate));
+                session.remove(candidate);
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (Objects.nonNull(transaction)) {
+                transaction.rollback();
+            }
+
+            log.error("Error", e);
+
+            throw e;
+        }
+    }
+
+    private StringBuilder buildHql(String fio, Set<CandidateStatus> statuses) {
         StringBuilder hql = new StringBuilder("FROM Candidate WHERE 1=1");
 
         if (fio != null && !fio.trim().isEmpty()) {
@@ -175,10 +198,6 @@ public class CandidatesHibernateRepositoryImpl implements CandidateRepository {
 
         if (statuses != null && !statuses.isEmpty()) {
             hql.append(" AND status IN (:statuses)");
-        }
-
-        if (position != null && !position.trim().isEmpty()) {
-            hql.append(" AND LOWER(position) LIKE LOWER(:position)");
         }
         return hql;
     }

@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import jakarta.persistence.*;
 import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "candidates")
@@ -21,17 +23,17 @@ public class Candidate {
     
     @Column(name = "age", nullable = false)
     private short age;
-    
-    @Column(name = "position", nullable = false)
-    private String position;
-    
+
     @Column(name = "cv_info")
     private String cvInfo;
-    
-    @Column(name = "comment")
-    private String comment;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private CandidateStatus status;
+
+    @ManyToMany(mappedBy = "candidates", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    private Set<Position> positions = new HashSet<>();
+
+    @OneToMany(mappedBy = "candidate", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> comments = new HashSet<>();
 } 

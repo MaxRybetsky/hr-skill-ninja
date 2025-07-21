@@ -136,16 +136,91 @@
 					]
 				}
 			}
+		},
+		{
+			"name": "Add Position",
+			"request": {
+				"method": "POST",
+				"header": [
+					{"key": "Content-Type", "value": "application/json"}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Backend Developer\",\n    \"description\": \"Responsible for backend systems\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/positions",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "v1", "positions"]
+				}
+			}
+		},
+		{
+			"name": "Add Candidate to Position",
+			"request": {
+				"method": "PUT",
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/positions/{{positionId}}/candidates/{{candidateId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "v1", "positions", "{{positionId}}", "candidates", "{{candidateId}}"]
+				}
+			}
+		},
+		{
+			"name": "Get Position with Candidates",
+			"request": {
+				"method": "GET",
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/positions/{{positionId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "v1", "positions", "{{positionId}}"]
+				}
+			}
+		},
+		{
+			"name": "Archive Position",
+			"request": {
+				"method": "PUT",
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/positions/{{positionId}}/archive",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "v1", "positions", "{{positionId}}", "archive"]
+				}
+			}
+		},
+		{
+			"name": "Add Comment to Candidate",
+			"request": {
+				"method": "POST",
+				"header": [
+					{"key": "Content-Type", "value": "application/json"}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"author\": \"HR Manager\",\n    \"comment\": \"Great interview!\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/candidates/{{candidateId}}/comments",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "v1", "candidates", "{{candidateId}}", "comments"]
+				}
+			}
+		},
+		{
+			"name": "Delete Candidate",
+			"request": {
+				"method": "DELETE",
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/candidates/{{candidateId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "v1", "candidates", "{{candidateId}}"]
+				}
+			}
 		}
 	],
 	"variable": [
-		{
-			"key": "baseUrl",
-			"value": "http://localhost:8090"
-		},
-		{
-			"key": "candidateId",
-			"value": "00000000-0000-0000-0000-000000000000"
-		}
+		{"key": "baseUrl", "value": "http://localhost:8090"},
+		{"key": "candidateId", "value": "00000000-0000-0000-0000-000000000000"},
+		{"key": "positionId", "value": "00000000-0000-0000-0000-000000000000"}
 	]
 }
