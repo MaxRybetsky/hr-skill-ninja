@@ -173,7 +173,6 @@ public class CandidatesHibernateRepositoryImpl implements CandidateRepository {
 
             Candidate candidate = session.get(Candidate.class, id);
             if (candidate != null) {
-                candidate.getPositions().forEach(position -> position.getCandidates().remove(candidate));
                 session.remove(candidate);
             }
 

@@ -52,18 +52,18 @@ public class HibernateConfig {
     public SessionFactory sessionFactory(DataSource dataSource) {
         Configuration configuration = new Configuration();
         
+        // Конфигурируем свойства подключения к БД
+        Properties properties = new Properties();
+        properties.put(AvailableSettings.DATASOURCE, dataSource);
+
+        configuration.setProperties(properties);
+
         // Конфигурируем свойства Hibernate
         configuration.setProperty(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
         configuration.setProperty(Environment.HBM2DDL_AUTO, "validate");
         configuration.setProperty(Environment.SHOW_SQL, "true");
         configuration.setProperty(Environment.FORMAT_SQL, "true");
         configuration.setProperty(Environment.USE_SQL_COMMENTS, "true");
-        
-        // Конфигурируем свойства подключения к БД
-        Properties properties = new Properties();
-        properties.put(AvailableSettings.DATASOURCE, dataSource);
-
-        configuration.setProperties(properties);
         
         // Добавим классы сущностей
         configuration.addAnnotatedClass(org.hrsninja.api.model.Candidate.class);

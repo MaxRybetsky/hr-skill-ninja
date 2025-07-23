@@ -30,7 +30,7 @@ public class Position {
     @Column(name = "created_date", nullable = false)
     private LocalDate createdDate;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
         name = "candidate_position",
         joinColumns = @JoinColumn(name = "position_id"),

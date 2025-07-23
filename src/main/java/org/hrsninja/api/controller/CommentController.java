@@ -7,6 +7,7 @@ import org.hrsninja.api.service.CommentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -19,5 +20,10 @@ public class CommentController {
     @ResponseStatus(HttpStatus.CREATED)
     public CommentDto addCommentToCandidate(@PathVariable UUID candidateId, @RequestBody CommentCreateRequest request) {
         return commentService.addCommentToCandidate(candidateId, request.getAuthor(), request.getComment());
+    }
+
+    @GetMapping
+    public List<CommentDto> getCommentsOfCandidate(@PathVariable UUID candidateId) {
+        return commentService.findAllByCandidateId(candidateId);
     }
 } 

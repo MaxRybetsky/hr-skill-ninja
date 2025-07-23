@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.hrsninja.api.util.TimeUtil.FIXED_DATETIME;
 
@@ -43,9 +42,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> findByCandidateId(UUID candidateId) {
+    public List<CommentDto> findAllByCandidateId(UUID candidateId) {
         Candidate candidate = candidateRepository.findById(candidateId)
                 .orElseThrow(() -> new IllegalArgumentException("Candidate not found"));
-        return candidate.getComments().stream().map(commentMapper::toDto).collect(Collectors.toList());
+
+        return commentRepository.findAllByCandidate(candidate)
+                .stream()
+                .map(commentMapper::toDto)
+                .toList();
     }
 } 

@@ -26,10 +26,13 @@ public class PositionHibernateRepositoryImpl implements PositionRepository {
     @Override
     public Position save(Position position) {
         Transaction transaction = null;
+
         try (Session session = sessionFactory.openSession()) {
             log.info("Save position via Hibernate");
             transaction = session.beginTransaction();
+
             session.merge(position);
+
             transaction.commit();
             return position;
         } catch (Exception e) {
@@ -44,10 +47,13 @@ public class PositionHibernateRepositoryImpl implements PositionRepository {
     @Override
     public Optional<Position> findById(UUID id) {
         Transaction transaction = null;
+
         try (Session session = sessionFactory.openSession()) {
             log.info("Find position by ID via Hibernate");
             transaction = session.beginTransaction();
+
             Position position = session.get(Position.class, id);
+
             transaction.commit();
             return Optional.ofNullable(position);
         } catch (Exception e) {
@@ -62,10 +68,13 @@ public class PositionHibernateRepositoryImpl implements PositionRepository {
     @Override
     public List<Position> findAll() {
         Transaction transaction = null;
+
         try (Session session = sessionFactory.openSession()) {
             log.info("Find all positions via Hibernate");
             transaction = session.beginTransaction();
+
             List<Position> positions = session.createQuery("FROM Position", Position.class).list();
+
             transaction.commit();
             return positions;
         } catch (Exception e) {
@@ -82,15 +91,17 @@ public class PositionHibernateRepositoryImpl implements PositionRepository {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             log.info("Add candidate to position via Hibernate");
+
             transaction = session.beginTransaction();
+
             Position position = session.get(Position.class, positionId);
             Candidate candidate = session.get(Candidate.class, candidateId);
+
             if (position != null && candidate != null) {
                 position.getCandidates().add(candidate);
                 candidate.getPositions().add(position);
-                session.merge(position);
-                session.merge(candidate);
             }
+
             transaction.commit();
         } catch (Exception e) {
             if (Objects.nonNull(transaction)) {
@@ -107,11 +118,13 @@ public class PositionHibernateRepositoryImpl implements PositionRepository {
         try (Session session = sessionFactory.openSession()) {
             log.info("Archive position via Hibernate");
             transaction = session.beginTransaction();
+
             Position position = session.get(Position.class, positionId);
+
             if (position != null) {
                 position.setStatus(PositionStatus.ARCHIVE);
-                session.merge(position);
             }
+
             transaction.commit();
         } catch (Exception e) {
             if (Objects.nonNull(transaction)) {
