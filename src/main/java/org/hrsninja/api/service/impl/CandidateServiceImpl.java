@@ -8,6 +8,7 @@ import org.hrsninja.api.model.Candidate;
 import org.hrsninja.api.model.CandidateStatus;
 import org.hrsninja.api.repository.CandidateRepository;
 import org.hrsninja.api.mapper.CandidateMapper;
+import org.hrsninja.api.repository.CandidateSearchRepository;
 import org.hrsninja.api.service.CandidateService;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import org.hrsninja.api.dto.ExtendedCandidateDTO;
 public class CandidateServiceImpl implements CandidateService {
 
     private final CandidateRepository repository;
+    private final CandidateSearchRepository searchRepository;
     private final CandidateMapper mapper;
 
     private static final Map<CandidateStatus, Set<CandidateStatus>> ALLOWED_TRANSITIONS = Map.of(
@@ -53,7 +55,7 @@ public class CandidateServiceImpl implements CandidateService {
         candidate.setAge(request.getAge());
         candidate.setCvInfo(request.getCvInfo());
 
-        return mapper.toDTO(repository.update(candidate));
+        return mapper.toDTO(repository.save(candidate));
     }
 
     @Override
@@ -67,7 +69,7 @@ public class CandidateServiceImpl implements CandidateService {
         }
 
         candidate.setStatus(request.getStatus());
-        return mapper.toDTO(repository.update(candidate));
+        return mapper.toDTO(repository.save(candidate));
     }
 
     @Override
@@ -86,7 +88,7 @@ public class CandidateServiceImpl implements CandidateService {
 
     @Override
     public List<CandidateDTO> search(String fio, Set<CandidateStatus> statuses) {
-        return repository.search(fio, statuses).stream()
+        return searchRepository.search(fio, statuses).stream()
             .map(mapper::toDTO)
             .collect(Collectors.toList());
     }

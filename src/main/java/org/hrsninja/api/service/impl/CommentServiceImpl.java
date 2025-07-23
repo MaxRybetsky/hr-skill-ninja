@@ -46,7 +46,7 @@ public class CommentServiceImpl implements CommentService {
         Candidate candidate = candidateRepository.findById(candidateId)
                 .orElseThrow(() -> new IllegalArgumentException("Candidate not found"));
 
-        return commentRepository.findAllByCandidate(candidate)
+        return commentRepository.findAllByCandidateId(candidate.getId())
                 .stream()
                 .map(commentMapper::toDto)
                 .toList();
