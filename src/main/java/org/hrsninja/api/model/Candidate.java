@@ -31,9 +31,9 @@ public class Candidate {
     @Enumerated(EnumType.STRING)
     private CandidateStatus status;
 
-    @ManyToMany(mappedBy = "candidates", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @ManyToMany(mappedBy = "candidates", cascade = CascadeType.MERGE)
     private Set<Position> positions = new HashSet<>();
 
-    @OneToMany(mappedBy = "candidate", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
 } 

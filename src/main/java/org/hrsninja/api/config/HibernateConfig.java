@@ -9,11 +9,15 @@ import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @org.springframework.context.annotation.Configuration
+@EnableTransactionManagement
 public class HibernateConfig {
 
     @Value("${spring.datasource.url}")
@@ -64,12 +68,18 @@ public class HibernateConfig {
         configuration.setProperty(Environment.SHOW_SQL, "true");
         configuration.setProperty(Environment.FORMAT_SQL, "true");
         configuration.setProperty(Environment.USE_SQL_COMMENTS, "true");
-        
+        configuration.setProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+
         // Добавим классы сущностей
         configuration.addAnnotatedClass(org.hrsninja.api.model.Candidate.class);
         configuration.addAnnotatedClass(org.hrsninja.api.model.Comment.class);
         configuration.addAnnotatedClass(org.hrsninja.api.model.Position.class);
         
         return configuration.buildSessionFactory();
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager(SessionFactory sf) {
+        return new HibernateTransactionManager(sf);
     }
 } 

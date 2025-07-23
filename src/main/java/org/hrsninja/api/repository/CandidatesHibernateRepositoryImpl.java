@@ -1,5 +1,6 @@
 package org.hrsninja.api.repository;
 
+import  org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -25,28 +26,14 @@ public class CandidatesHibernateRepositoryImpl implements CandidateRepository {
     private final SessionFactory sessionFactory;
 
     @Override
+    @Transactional
     public Candidate save(Candidate candidate) {
-        Transaction transaction = null;
+        Session session = sessionFactory.getCurrentSession();
+        log.info("Save candidate via Hibernate");
 
-        try (Session session = sessionFactory.openSession()) {
-            log.info("Save candidate via Hibernate");
+        session.persist(candidate);
 
-            transaction = session.beginTransaction();
-
-            session.persist(candidate);
-
-            transaction.commit();
-
-            return candidate;
-        } catch (Exception e) {
-            if (Objects.nonNull(transaction)) {
-                transaction.rollback();
-            }
-
-            log.error("Error", e);
-
-            throw e;
-        }
+        return candidate;
     }
 
     @Override
@@ -74,27 +61,27 @@ public class CandidatesHibernateRepositoryImpl implements CandidateRepository {
         }
     }
 
-    @Override
     public Optional<Candidate> findById(UUID id) {
         Transaction transaction = null;
-
         try (Session session = sessionFactory.openSession()) {
             log.info("Find candidate by ID via Hibernate");
-
             transaction = session.beginTransaction();
 
-            Candidate candidate = session.get(Candidate.class, id);
+            Query<Candidate> query = session.createQuery(
+                    "SELECT DISTINCT c FROM Candidate c " +
+                            "LEFT JOIN FETCH c.positions " +
+                            "LEFT JOIN FETCH c.comments " +
+                            "WHERE c.id = :id", Candidate.class);
+            query.setParameter("id", id);
+            Optional<Candidate> candidate = query.uniqueResultOptional();
 
             transaction.commit();
-
-            return Optional.ofNullable(candidate);
+            return candidate;
         } catch (Exception e) {
             if (Objects.nonNull(transaction)) {
                 transaction.rollback();
             }
-
             log.error("Error", e);
-
             throw e;
         }
     }
@@ -137,11 +124,11 @@ public class CandidatesHibernateRepositoryImpl implements CandidateRepository {
             StringBuilder hql = buildHql(fio, statuses);
 
             Query<Candidate> query = session.createQuery(hql.toString(), Candidate.class);
-            
+
             if (fio != null && !fio.trim().isEmpty()) {
                 query.setParameter("fio", "%" + fio.trim() + "%");
             }
-            
+
             if (statuses != null && !statuses.isEmpty()) {
                 query.setParameter("statuses", statuses);
             }

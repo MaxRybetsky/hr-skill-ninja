@@ -54,6 +54,14 @@
             <artifactId>flyway-database-postgresql</artifactId>
             <version>${flyway.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+        </dependency>
 
         <!-- Зависимости для Hibernate и DataSource + Connection Pool -->
         <dependency>
