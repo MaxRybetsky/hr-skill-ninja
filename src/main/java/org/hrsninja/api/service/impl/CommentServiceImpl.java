@@ -1,6 +1,7 @@
 package org.hrsninja.api.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.hrsninja.api.dto.ExtendedCommentDto;
 import org.hrsninja.api.model.Candidate;
 import org.hrsninja.api.model.Comment;
 import org.hrsninja.api.repository.CandidateRepository;
@@ -9,6 +10,7 @@ import org.hrsninja.api.dto.CommentDto;
 import org.hrsninja.api.mapper.CommentMapper;
 import org.hrsninja.api.service.CommentService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +51,15 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.findAllByCandidate(candidate)
                 .stream()
                 .map(commentMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    // Фикс LIE, но не фикс N+1 - @Transactional(readOnly = true)
+    public List<ExtendedCommentDto> findAll() {
+        return commentRepository.findAllExtended()
+                .stream()
+                .map(commentMapper::toExtDto)
                 .toList();
     }
 } 

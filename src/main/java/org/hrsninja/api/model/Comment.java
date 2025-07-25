@@ -24,7 +24,7 @@ public class Comment {
     @Column(name = "created_datetime", nullable = false)
     private LocalDateTime createdDatetime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "candidate_id")
     private Candidate candidate;
 } 

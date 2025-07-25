@@ -43,4 +43,21 @@ public class CommentHibernateRepositoryImpl implements CommentRepository {
                 .setParameter("candidate", candidate)
                 .getResultList();
     }
+
+    @Override
+    public List<Comment> findAllExtended() {
+        log.info("Find All Comments with Extended Candidate info");
+
+        String jql = "SELECT c FROM Comment c" +
+                " JOIN FETCH c.candidate";
+
+        return em.createQuery(jql, Comment.class)
+                .getResultList();
+
+        /*
+        // Первоначальная версия
+        return em.createQuery("FROM Comment ", Comment.class)
+                .getResultList();
+        */
+    }
 } 

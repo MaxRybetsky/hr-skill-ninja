@@ -11,4 +11,5 @@ public interface CommentRepository {
     Comment save(Comment comment);
     Optional<Comment> findById(UUID id);
     List<Comment> findAllByCandidate(Candidate candidate);
-} 
+    List<Comment> findAllExtended();
+}
