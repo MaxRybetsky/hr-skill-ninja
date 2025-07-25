@@ -9,6 +9,8 @@ spring:
     locations: classpath:db/migration
     schemas: public
   jpa:
+    # Показать этот параметр
+    open-in-view: false
     show-sql: true
     properties:
       hibernate:

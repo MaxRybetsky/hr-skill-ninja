@@ -11,7 +11,7 @@ public interface CandidateService {
     CandidateDTO update(UUID id, UpdateCandidateRequest request);
     CandidateDTO changeStatus(UUID id, ChangeStatusRequest request);
     List<CandidateDTO> findAll();
-    ExtendedCandidateDTO findById(UUID id);
+    ExtendedCandidateDTO findExtendedById(UUID id);
     List<CandidateDTO> search(String fio, Set<CandidateStatus> statuses);
     void deleteById(UUID id);
 }

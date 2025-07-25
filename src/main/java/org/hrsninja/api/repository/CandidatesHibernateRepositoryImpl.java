@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.hrsninja.api.model.Candidate;
 import org.hrsninja.api.model.CandidateStatus;
 import org.springframework.context.annotation.Primary;
@@ -40,6 +41,35 @@ public class CandidatesHibernateRepositoryImpl implements CandidateRepository {
     public Optional<Candidate> findById(UUID id) {
         Candidate candidate = em.find(Candidate.class, id);
         return Optional.ofNullable(candidate);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Candidate> findExtendedById(UUID id) {
+        // 1-й способ через JOIN FETCH
+        String jql = "SELECT c " +
+                "FROM Candidate c " +
+                "JOIN FETCH c.positions p " +
+                "JOIN FETCH c.comments " +
+                "JOIN FETCH p.candidates " +
+                "WHERE c.id=:id";
+
+        Candidate candidate = em.createQuery(jql, Candidate.class)
+                .setParameter("id", id)
+                .getSingleResult();
+
+        /*
+        // 2-й Способ через Hibernate.initialize(...);
+
+        Candidate candidate = em.find(Candidate.class, id);
+
+        Hibernate.initialize(candidate.getPositions());
+        Hibernate.initialize(candidate.getComments());
+        candidate.getPositions().forEach(position -> Hibernate.initialize(position.getCandidates()));
+
+        */
+
+        return Optional.of(candidate);
     }
 
     @Override

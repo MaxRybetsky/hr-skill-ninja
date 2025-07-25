@@ -11,6 +11,7 @@ public interface CandidateRepository {
     Candidate save(Candidate candidate);
     Candidate update(Candidate candidate);
     Optional<Candidate> findById(UUID id);
+    Optional<Candidate> findExtendedById(UUID id);
     List<Candidate> findAll();
     List<Candidate> search(String fio, Set<CandidateStatus> statuses);
     void deleteById(UUID id);

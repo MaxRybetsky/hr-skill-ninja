@@ -43,9 +43,8 @@ public class CandidateController {
     }
 
     @GetMapping("/{id}")
-    public ExtendedCandidateDTO findById(@PathVariable UUID id) {
-        // Returns candidate with all comments (see Candidate entity mapping)
-        return service.findById(id);
+    public ExtendedCandidateDTO findExtendedById(@PathVariable UUID id) {
+        return service.findExtendedById(id);
     }
 
     @DeleteMapping("/{id}")

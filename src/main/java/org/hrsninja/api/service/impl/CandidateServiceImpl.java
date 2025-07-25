@@ -78,8 +78,9 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
-    public ExtendedCandidateDTO findById(UUID id) {
-        return repository.findById(id)
+    // @Transactional(readOnly=true) - как один из вариантов фикс LIE
+    public ExtendedCandidateDTO findExtendedById(UUID id) {
+        return repository.findExtendedById(id)
                 .map(mapper::toExtendedDTO)
                 .orElseThrow(() -> new CandidateNotFoundException(id));
     }
