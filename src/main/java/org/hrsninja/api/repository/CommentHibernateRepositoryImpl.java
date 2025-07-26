@@ -1,5 +1,6 @@
 package org.hrsninja.api.repository;
 
+import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CommentHibernateRepositoryImpl implements CommentRepository {
     private final EntityManager em;
+    private final CommentJpaRepository commentJpaRepository;
 
     @Override
     @Transactional
@@ -48,16 +50,17 @@ public class CommentHibernateRepositoryImpl implements CommentRepository {
     public List<Comment> findAllExtended() {
         log.info("Find All Comments with Extended Candidate info");
 
-        String jql = "SELECT c FROM Comment c" +
-                " JOIN FETCH c.candidate";
+        // 1. Строим граф: что именно нужно подтянуть «сразу»
+        EntityGraph<Comment> graph = em.createEntityGraph(Comment.class);
+        graph.addAttributeNodes("candidate");     // lazy-поле, которое хотим вытащить
 
-        return em.createQuery(jql, Comment.class)
-                .getResultList();
+        // 2. Выполняем обычный select, передавая граф через hint
+        return em.createQuery("SELECT c FROM Comment c", Comment.class)
+                .setHint("jakarta.persistence.fetchgraph", graph)
+                .getResultList();                // Hibernate сгенерирует JOIN автоматически
 
-        /*
-        // Первоначальная версия
-        return em.createQuery("FROM Comment ", Comment.class)
-                .getResultList();
-        */
+
+        // Через JpaRepository:
+        // return commentJpaRepository.findAllExtended();
     }
 } 
