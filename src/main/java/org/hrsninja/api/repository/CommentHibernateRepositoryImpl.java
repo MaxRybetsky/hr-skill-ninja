@@ -20,7 +20,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CommentHibernateRepositoryImpl implements CommentRepository {
     private final EntityManager em;
-    private final CommentJpaRepository commentJpaRepository;
 
     @Override
     @Transactional
@@ -58,9 +57,5 @@ public class CommentHibernateRepositoryImpl implements CommentRepository {
         return em.createQuery("SELECT c FROM Comment c", Comment.class)
                 .setHint("jakarta.persistence.fetchgraph", graph)
                 .getResultList();                // Hibernate сгенерирует JOIN автоматически
-
-
-        // Через JpaRepository:
-        // return commentJpaRepository.findAllExtended();
     }
 } 

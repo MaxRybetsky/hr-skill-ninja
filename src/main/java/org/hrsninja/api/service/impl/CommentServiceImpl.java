@@ -5,6 +5,7 @@ import org.hrsninja.api.dto.ExtendedCommentDto;
 import org.hrsninja.api.model.Candidate;
 import org.hrsninja.api.model.Comment;
 import org.hrsninja.api.repository.CandidateRepository;
+import org.hrsninja.api.repository.CommentJpaRepository;
 import org.hrsninja.api.repository.CommentRepository;
 import org.hrsninja.api.dto.CommentDto;
 import org.hrsninja.api.mapper.CommentMapper;
@@ -24,6 +25,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final CandidateRepository candidateRepository;
     private final CommentMapper commentMapper;
+    private final CommentJpaRepository commentJpaRepository;
 
     @Override
     public CommentDto addCommentToCandidate(UUID candidateId, String author, String commentText) {
@@ -57,7 +59,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     // Фикс LIE, но не фикс N+1 - @Transactional(readOnly = true)
     public List<ExtendedCommentDto> findAll() {
-        return commentRepository.findAllExtended()
+        return commentJpaRepository.findAllExtended()
                 .stream()
                 .map(commentMapper::toExtDto)
                 .toList();
