@@ -46,7 +46,18 @@ public class CandidatesHibernateRepositoryImpl implements CandidateRepository {
     @Override
     @Transactional(readOnly = true)
     public Optional<Candidate> findExtendedById(UUID id) {
-        // 1-й способ через JOIN FETCH
+        /*
+        // 1-й Способ через Hibernate.initialize(...);
+
+        Candidate candidate = em.find(Candidate.class, id);
+
+        Hibernate.initialize(candidate.getPositions());
+        Hibernate.initialize(candidate.getComments());
+        candidate.getPositions().forEach(position -> Hibernate.initialize(position.getCandidates()));
+
+        */
+
+        // 2-й способ через JOIN FETCH
         String jql = "SELECT c " +
                 "FROM Candidate c " +
                 "JOIN FETCH c.positions p " +
@@ -57,17 +68,6 @@ public class CandidatesHibernateRepositoryImpl implements CandidateRepository {
         Candidate candidate = em.createQuery(jql, Candidate.class)
                 .setParameter("id", id)
                 .getSingleResult();
-
-        /*
-        // 2-й Способ через Hibernate.initialize(...);
-
-        Candidate candidate = em.find(Candidate.class, id);
-
-        Hibernate.initialize(candidate.getPositions());
-        Hibernate.initialize(candidate.getComments());
-        candidate.getPositions().forEach(position -> Hibernate.initialize(position.getCandidates()));
-
-        */
 
         return Optional.of(candidate);
     }

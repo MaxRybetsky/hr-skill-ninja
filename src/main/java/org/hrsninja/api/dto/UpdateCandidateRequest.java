@@ -19,9 +19,5 @@ public class UpdateCandidateRequest {
     private short age;
 
     @NotBlank
-    @Size(max = 255)
-    private String position;
-
-    @NotBlank
     private String cvInfo;
 }
