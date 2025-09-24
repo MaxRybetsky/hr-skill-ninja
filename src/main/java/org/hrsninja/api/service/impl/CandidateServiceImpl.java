@@ -78,7 +78,6 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     @Override
-    // @Transactional(readOnly=true) - как один из вариантов фикс LIE
     public ExtendedCandidateDTO findExtendedById(UUID id) {
         return repository.findExtendedById(id)
                 .map(mapper::toExtendedDTO)
